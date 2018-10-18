@@ -61,7 +61,7 @@
 #endif  // V8_OS_WIN
 
 
-
+V8_EXPORT void V8_ParseWithOutPlugin();
 V8_EXPORT void V8_ParseWithPlugin();
 
 V8_EXPORT void V8_AddIntrinsicFoo(const char* name, void* fooaddr, int paramsize, int resultsize);
@@ -10484,7 +10484,8 @@ void V8::VisitHandlesForPartialDependence(Isolate* isolate,
 
 }  // namespace v8
 
-
+V8_EXPORT v8::Object* V8_ThrowException(v8::Isolate* pIsolate,
+                                        const char* exceptionmsg);
 #undef TYPE_CHECK
 
 
