@@ -8,13 +8,13 @@
 
 namespace v8 {
 namespace internal {
-
+/*
 BUILTIN(IsPromise) {
   SealHandleScope scope(isolate);
 
   Handle<Object> object = args.atOrUndefined(isolate, 1);
   return isolate->heap()->ToBoolean(object->IsJSPromise());
 }
-
+*/
 }  // namespace internal
 }  // namespace v8

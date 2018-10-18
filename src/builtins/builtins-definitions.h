@@ -739,45 +739,6 @@ namespace internal {
   TFS(ForInEnumerate, kReceiver)                                               \
   TFS(ForInFilter, kKey, kObject)                                              \
                                                                                \
-  /* Promise */                                                                \
-  /* ES6 #sec-getcapabilitiesexecutor-functions */                             \
-  TFJ(PromiseGetCapabilitiesExecutor, 2, kResolve, kReject)                    \
-  /* ES6 #sec-newpromisecapability */                                          \
-  TFJ(NewPromiseCapability, 2, kConstructor, kDebugEvent)                      \
-  /* ES6 #sec-promise-executor */                                              \
-  TFJ(PromiseConstructor, 1, kExecutor)                                        \
-  TFJ(PromiseInternalConstructor, 1, kParent)                                  \
-  CPP(IsPromise)                                                               \
-  /* ES #sec-promise-resolve-functions */                                      \
-  TFJ(PromiseResolveClosure, 1, kValue)                                        \
-  /* ES #sec-promise-reject-functions */                                       \
-  TFJ(PromiseRejectClosure, 1, kValue)                                         \
-  TFJ(PromiseAllResolveElementClosure, 1, kValue)                              \
-  /* ES #sec-promise.prototype.then */                                         \
-  TFJ(PromiseThen, 2, kOnFullfilled, kOnRejected)                              \
-  /* ES #sec-promise.prototype.catch */                                        \
-  TFJ(PromiseCatch, 1, kOnRejected)                                            \
-  /* ES #sec-fulfillpromise */                                                 \
-  TFJ(ResolvePromise, 2, kPromise, kValue)                                     \
-  TFS(PromiseHandleReject, kPromise, kOnReject, kException)                    \
-  TFJ(PromiseHandle, 5, kValue, kHandler, kDeferredPromise,                    \
-      kDeferredOnResolve, kDeferredOnReject)                                   \
-  /* ES #sec-promise.resolve */                                                \
-  TFJ(PromiseResolveWrapper, 1, kValue)                                        \
-  TFS(PromiseResolve, kConstructor, kValue)                                    \
-  /* ES #sec-promise.reject */                                                 \
-  TFJ(PromiseReject, 1, kReason)                                               \
-  TFJ(InternalPromiseReject, 3, kPromise, kReason, kDebugEvent)                \
-  TFJ(PromiseFinally, 1, kOnFinally)                                           \
-  TFJ(PromiseThenFinally, 1, kValue)                                           \
-  TFJ(PromiseCatchFinally, 1, kReason)                                         \
-  TFJ(PromiseValueThunkFinally, 0)                                             \
-  TFJ(PromiseThrowerFinally, 0)                                                \
-  /* ES #sec-promise.all */                                                    \
-  TFJ(PromiseAll, 1, kIterable)                                                \
-  /* ES #sec-promise.race */                                                   \
-  TFJ(PromiseRace, 1, kIterable)                                               \
-                                                                               \
   /* Proxy */                                                                  \
   TFJ(ProxyConstructor, 0)                                                     \
   TFJ(ProxyConstructor_ConstructStub,                                          \
@@ -1207,3 +1168,8 @@ namespace internal {
 }  // namespace v8
 
 #endif  // V8_BUILTINS_BUILTINS_DEFINITIONS_H_
+
+
+
+
+                                                                            

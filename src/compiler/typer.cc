@@ -60,11 +60,7 @@ Typer::Typer(Isolate* isolate, Flags flags, Graph* graph)
   graph_->AddDecorator(decorator_);
 }
 
-
-Typer::~Typer() {
-  graph_->RemoveDecorator(decorator_);
-}
-
+Typer::~Typer() { graph_->RemoveDecorator(decorator_); }
 
 class Typer::Visitor : public Reducer {
  public:
@@ -148,11 +144,14 @@ class Typer::Visitor : public Reducer {
   Type* TypeNode(Node* node) {
     switch (node->opcode()) {
 #define DECLARE_CASE(x) \
-      case IrOpcode::k##x: return TypeBinaryOp(node, x##Typer);
+  case IrOpcode::k##x:  \
+    return TypeBinaryOp(node, x##Typer);
       JS_SIMPLE_BINOP_LIST(DECLARE_CASE)
 #undef DECLARE_CASE
 
-#define DECLARE_CASE(x) case IrOpcode::k##x: return Type##x(node);
+#define DECLARE_CASE(x) \
+  case IrOpcode::k##x:  \
+    return Type##x(node);
       DECLARE_CASE(Start)
       DECLARE_CASE(IfException)
       // VALUE_OP_LIST without JS_SIMPLE_BINOP_LIST:
@@ -377,19 +376,16 @@ void Typer::Decorator::Decorate(Node* node) {
   }
 }
 
-
 // -----------------------------------------------------------------------------
 
 // Helper functions that lift a function f on types to a function on bounds,
 // and uses that to type the given node.  Note that f is never called with None
 // as an argument.
 
-
 Type* Typer::Visitor::TypeUnaryOp(Node* node, UnaryTyperFun f) {
   Type* input = Operand(node, 0);
   return input->IsInhabited() ? f(input, typer_) : Type::None();
 }
-
 
 Type* Typer::Visitor::TypeBinaryOp(Node* node, BinaryTyperFun f) {
   Type* left = Operand(node, 0);
@@ -397,7 +393,6 @@ Type* Typer::Visitor::TypeBinaryOp(Node* node, BinaryTyperFun f) {
   return left->IsInhabited() && right->IsInhabited() ? f(left, right, typer_)
                                                      : Type::None();
 }
-
 
 Typer::Visitor::ComparisonOutcome Typer::Visitor::Invert(
     ComparisonOutcome outcome, Typer* t) {
@@ -407,7 +402,6 @@ Typer::Visitor::ComparisonOutcome Typer::Visitor::Invert(
   if ((outcome & kComparisonFalse) != 0) result |= kComparisonTrue;
   return result;
 }
-
 
 Type* Typer::Visitor::FalsifyUndefined(ComparisonOutcome outcome, Typer* t) {
   if ((outcome & kComparisonFalse) != 0 ||
@@ -429,7 +423,6 @@ Type* Typer::Visitor::ToPrimitive(Type* type, Typer* t) {
   return Type::Primitive();
 }
 
-
 Type* Typer::Visitor::ToBoolean(Type* type, Typer* t) {
   if (type->Is(Type::Boolean())) return type;
   if (type->Is(t->falsish_)) return t->singleton_false_;
@@ -439,7 +432,6 @@ Type* Typer::Visitor::ToBoolean(Type* type, Typer* t) {
   }
   return Type::Boolean();
 }
-
 
 // static
 Type* Typer::Visitor::ToInteger(Type* type, Typer* t) {
@@ -453,7 +445,6 @@ Type* Typer::Visitor::ToInteger(Type* type, Typer* t) {
   }
   return t->cache_.kIntegerOrMinusZero;
 }
-
 
 // static
 Type* Typer::Visitor::ToLength(Type* type, Typer* t) {
@@ -472,7 +463,6 @@ Type* Typer::Visitor::ToLength(Type* type, Typer* t) {
   return Type::Range(min, max, t->zone());
 }
 
-
 // static
 Type* Typer::Visitor::ToName(Type* type, Typer* t) {
   // ES6 section 7.1.14 ToPropertyKey ( argument )
@@ -482,12 +472,10 @@ Type* Typer::Visitor::ToName(Type* type, Typer* t) {
   return ToString(type, t);
 }
 
-
 // static
 Type* Typer::Visitor::ToNumber(Type* type, Typer* t) {
   return t->operation_typer_.ToNumber(type);
 }
-
 
 // static
 Type* Typer::Visitor::ToObject(Type* type, Typer* t) {
@@ -499,7 +487,6 @@ Type* Typer::Visitor::ToObject(Type* type, Typer* t) {
   }
   return Type::Receiver();
 }
-
 
 // static
 Type* Typer::Visitor::ToString(Type* type, Typer* t) {
@@ -553,13 +540,11 @@ Type* Typer::Visitor::ObjectIsNumber(Type* type, Typer* t) {
   return Type::Boolean();
 }
 
-
 Type* Typer::Visitor::ObjectIsReceiver(Type* type, Typer* t) {
   if (type->Is(Type::Receiver())) return t->singleton_true_;
   if (!type->Maybe(Type::Receiver())) return t->singleton_false_;
   return Type::Boolean();
 }
-
 
 Type* Typer::Visitor::ObjectIsSmi(Type* type, Typer* t) {
   if (!type->Maybe(Type::SignedSmall())) return t->singleton_false_;
@@ -584,9 +569,7 @@ Type* Typer::Visitor::ObjectIsUndetectable(Type* type, Typer* t) {
   return Type::Boolean();
 }
 
-
 // -----------------------------------------------------------------------------
-
 
 // Control operators.
 
@@ -629,17 +612,11 @@ Type* Typer::Visitor::TypeParameter(Node* node) {
 
 Type* Typer::Visitor::TypeOsrValue(Node* node) { return Type::Any(); }
 
-Type* Typer::Visitor::TypeRetain(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeRetain(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeInt32Constant(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeInt32Constant(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeInt64Constant(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeInt64Constant(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeRelocatableInt32Constant(Node* node) {
   UNREACHABLE();
@@ -649,13 +626,9 @@ Type* Typer::Visitor::TypeRelocatableInt64Constant(Node* node) {
   UNREACHABLE();
 }
 
-Type* Typer::Visitor::TypeFloat32Constant(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeFloat32Constant(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeFloat64Constant(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeFloat64Constant(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeNumberConstant(Node* node) {
   double number = OpParameter<double>(node);
@@ -797,19 +770,13 @@ Type* Typer::Visitor::TypeInductionVariablePhi(Node* node) {
   return Type::Range(min, max, typer_->zone());
 }
 
-Type* Typer::Visitor::TypeEffectPhi(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeEffectPhi(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeLoopExit(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeLoopExit(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeLoopExitValue(Node* node) { return Operand(node, 0); }
 
-Type* Typer::Visitor::TypeLoopExitEffect(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeLoopExitEffect(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeEnsureWritableFastElements(Node* node) {
   return Operand(node, 1);
@@ -819,21 +786,13 @@ Type* Typer::Visitor::TypeMaybeGrowFastElements(Node* node) {
   return Operand(node, 1);
 }
 
-Type* Typer::Visitor::TypeTransitionElementsKind(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeTransitionElementsKind(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeCheckpoint(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeCheckpoint(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeBeginRegion(Node* node) {
-  UNREACHABLE();
-}
-
+Type* Typer::Visitor::TypeBeginRegion(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeFinishRegion(Node* node) { return Operand(node, 0); }
-
 
 Type* Typer::Visitor::TypeFrameState(Node* node) {
   // TODO(rossberg): Ideally FrameState wouldn't have a value output.
@@ -889,7 +848,6 @@ Type* Typer::Visitor::TypeDead(Node* node) { return Type::None(); }
 
 // JS comparison operators.
 
-
 Type* Typer::Visitor::JSEqualTyper(Type* lhs, Type* rhs, Typer* t) {
   if (lhs->Is(Type::NaN()) || rhs->Is(Type::NaN())) return t->singleton_false_;
   if (lhs->Is(Type::NullOrUndefined()) && rhs->Is(Type::NullOrUndefined())) {
@@ -907,7 +865,6 @@ Type* Typer::Visitor::JSEqualTyper(Type* lhs, Type* rhs, Typer* t) {
   return Type::Boolean();
 }
 
-
 static Type* JSType(Type* type) {
   if (type->Is(Type::Boolean())) return Type::Boolean();
   if (type->Is(Type::String())) return Type::String();
@@ -918,7 +875,6 @@ static Type* JSType(Type* type) {
   if (type->Is(Type::Receiver())) return Type::Receiver();  // JS "Object"
   return Type::Any();
 }
-
 
 Type* Typer::Visitor::JSStrictEqualTyper(Type* lhs, Type* rhs, Typer* t) {
   if (!JSType(lhs)->Maybe(JSType(rhs))) return t->singleton_false_;
@@ -937,7 +893,6 @@ Type* Typer::Visitor::JSStrictEqualTyper(Type* lhs, Type* rhs, Typer* t) {
   }
   return Type::Boolean();
 }
-
 
 // The EcmaScript specification defines the four relational comparison operators
 // (<, <=, >=, >) with the help of a single abstract one.  It behaves like <
@@ -983,59 +938,48 @@ Typer::Visitor::ComparisonOutcome Typer::Visitor::NumberCompareTyper(Type* lhs,
   return result;
 }
 
-
 Type* Typer::Visitor::JSLessThanTyper(Type* lhs, Type* rhs, Typer* t) {
   return FalsifyUndefined(JSCompareTyper(lhs, rhs, t), t);
 }
-
 
 Type* Typer::Visitor::JSGreaterThanTyper(Type* lhs, Type* rhs, Typer* t) {
   return FalsifyUndefined(JSCompareTyper(rhs, lhs, t), t);
 }
 
-
 Type* Typer::Visitor::JSLessThanOrEqualTyper(Type* lhs, Type* rhs, Typer* t) {
   return FalsifyUndefined(Invert(JSCompareTyper(rhs, lhs, t), t), t);
 }
 
-
-Type* Typer::Visitor::JSGreaterThanOrEqualTyper(
-    Type* lhs, Type* rhs, Typer* t) {
+Type* Typer::Visitor::JSGreaterThanOrEqualTyper(Type* lhs, Type* rhs,
+                                                Typer* t) {
   return FalsifyUndefined(Invert(JSCompareTyper(lhs, rhs, t), t), t);
 }
 
 // JS bitwise operators.
 
-
 Type* Typer::Visitor::JSBitwiseOrTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberBitwiseOr(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
-
 
 Type* Typer::Visitor::JSBitwiseAndTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberBitwiseAnd(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
 
-
 Type* Typer::Visitor::JSBitwiseXorTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberBitwiseXor(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
-
 
 Type* Typer::Visitor::JSShiftLeftTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberShiftLeft(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
 
-
 Type* Typer::Visitor::JSShiftRightTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberShiftRight(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
 
-
 Type* Typer::Visitor::JSShiftRightLogicalTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberShiftRightLogical(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
-
 
 // JS arithmetic operators.
 
@@ -1069,7 +1013,6 @@ Type* Typer::Visitor::JSModulusTyper(Type* lhs, Type* rhs, Typer* t) {
   return NumberModulus(ToNumber(lhs, t), ToNumber(rhs, t), t);
 }
 
-
 // JS unary operators.
 
 Type* Typer::Visitor::TypeJSClassOf(Node* node) {
@@ -1080,9 +1023,7 @@ Type* Typer::Visitor::TypeJSTypeOf(Node* node) {
   return Type::InternalizedString();
 }
 
-
 // JS conversion operators.
-
 
 Type* Typer::Visitor::TypeJSToBoolean(Node* node) {
   return TypeUnaryOp(node, ToBoolean);
@@ -1114,9 +1055,7 @@ Type* Typer::Visitor::TypeJSToString(Node* node) {
 
 // JS object operators.
 
-
 Type* Typer::Visitor::TypeJSCreate(Node* node) { return Type::Object(); }
-
 
 Type* Typer::Visitor::TypeJSCreateArguments(Node* node) {
   switch (CreateArgumentsTypeOf(node->op())) {
@@ -1138,7 +1077,6 @@ Type* Typer::Visitor::TypeJSCreateGeneratorObject(Node* node) {
 Type* Typer::Visitor::TypeJSCreateClosure(Node* node) {
   return Type::Function();
 }
-
 
 Type* Typer::Visitor::TypeJSCreateIterResultObject(Node* node) {
   return Type::OtherObject();
@@ -1168,11 +1106,9 @@ Type* Typer::Visitor::TypeJSCreateLiteralRegExp(Node* node) {
   return Type::OtherObject();
 }
 
-
 Type* Typer::Visitor::TypeJSLoadProperty(Node* node) {
   return Type::NonInternal();
 }
-
 
 Type* Typer::Visitor::TypeJSLoadNamed(Node* node) {
   return Type::NonInternal();
@@ -1189,20 +1125,48 @@ Type* Typer::Visitor::TypeJSLoadGlobal(Node* node) {
 // increasing the limits to the closest power of two.
 Type* Typer::Visitor::Weaken(Node* node, Type* current_type,
                              Type* previous_type) {
-  static const double kWeakenMinLimits[] = {
-      0.0, -1073741824.0, -2147483648.0, -4294967296.0, -8589934592.0,
-      -17179869184.0, -34359738368.0, -68719476736.0, -137438953472.0,
-      -274877906944.0, -549755813888.0, -1099511627776.0, -2199023255552.0,
-      -4398046511104.0, -8796093022208.0, -17592186044416.0, -35184372088832.0,
-      -70368744177664.0, -140737488355328.0, -281474976710656.0,
-      -562949953421312.0};
-  static const double kWeakenMaxLimits[] = {
-      0.0, 1073741823.0, 2147483647.0, 4294967295.0, 8589934591.0,
-      17179869183.0, 34359738367.0, 68719476735.0, 137438953471.0,
-      274877906943.0, 549755813887.0, 1099511627775.0, 2199023255551.0,
-      4398046511103.0, 8796093022207.0, 17592186044415.0, 35184372088831.0,
-      70368744177663.0, 140737488355327.0, 281474976710655.0,
-      562949953421311.0};
+  static const double kWeakenMinLimits[] = {0.0,
+                                            -1073741824.0,
+                                            -2147483648.0,
+                                            -4294967296.0,
+                                            -8589934592.0,
+                                            -17179869184.0,
+                                            -34359738368.0,
+                                            -68719476736.0,
+                                            -137438953472.0,
+                                            -274877906944.0,
+                                            -549755813888.0,
+                                            -1099511627776.0,
+                                            -2199023255552.0,
+                                            -4398046511104.0,
+                                            -8796093022208.0,
+                                            -17592186044416.0,
+                                            -35184372088832.0,
+                                            -70368744177664.0,
+                                            -140737488355328.0,
+                                            -281474976710656.0,
+                                            -562949953421312.0};
+  static const double kWeakenMaxLimits[] = {0.0,
+                                            1073741823.0,
+                                            2147483647.0,
+                                            4294967295.0,
+                                            8589934591.0,
+                                            17179869183.0,
+                                            34359738367.0,
+                                            68719476735.0,
+                                            137438953471.0,
+                                            274877906943.0,
+                                            549755813887.0,
+                                            1099511627775.0,
+                                            2199023255551.0,
+                                            4398046511103.0,
+                                            8796093022207.0,
+                                            17592186044415.0,
+                                            35184372088831.0,
+                                            70368744177663.0,
+                                            140737488355327.0,
+                                            281474976710655.0,
+                                            562949953421311.0};
   STATIC_ASSERT(arraysize(kWeakenMinLimits) == arraysize(kWeakenMaxLimits));
 
   // If the types have nothing to do with integers, return the types.
@@ -1262,24 +1226,13 @@ Type* Typer::Visitor::Weaken(Node* node, Type* current_type,
                      typer_->zone());
 }
 
+Type* Typer::Visitor::TypeJSStoreProperty(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeJSStoreProperty(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeJSStoreNamed(Node* node) { UNREACHABLE(); }
 
+Type* Typer::Visitor::TypeJSStoreGlobal(Node* node) { UNREACHABLE(); }
 
-Type* Typer::Visitor::TypeJSStoreNamed(Node* node) {
-  UNREACHABLE();
-}
-
-
-Type* Typer::Visitor::TypeJSStoreGlobal(Node* node) {
-  UNREACHABLE();
-}
-
-Type* Typer::Visitor::TypeJSStoreNamedOwn(Node* node) {
-  UNREACHABLE();
-}
+Type* Typer::Visitor::TypeJSStoreNamedOwn(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeJSStoreDataPropertyInLiteral(Node* node) {
   UNREACHABLE();
@@ -1313,7 +1266,6 @@ Type* Typer::Visitor::TypeJSGetSuperConstructor(Node* node) {
 
 // JS context operators.
 
-
 Type* Typer::Visitor::TypeJSLoadContext(Node* node) {
   ContextAccess const& access = ContextAccessOf(node->op());
   switch (access.index()) {
@@ -1327,11 +1279,7 @@ Type* Typer::Visitor::TypeJSLoadContext(Node* node) {
   }
 }
 
-
-Type* Typer::Visitor::TypeJSStoreContext(Node* node) {
-  UNREACHABLE();
-}
-
+Type* Typer::Visitor::TypeJSStoreContext(Node* node) { UNREACHABLE(); }
 
 Type* Typer::Visitor::TypeJSCreateFunctionContext(Node* node) {
   return Type::OtherInternal();
@@ -1416,7 +1364,8 @@ Type* Typer::Visitor::JSCallTyper(Type* fun, Typer* t) {
           return Type::Signed32();
         case kMathClz32:
           return t->cache_.kZeroToThirtyTwo;
-        // Date functions.
+          // Date functions.
+          /*
         case kDateNow:
           return t->cache_.kTimeValueType;
         case kDateGetDate:
@@ -1438,7 +1387,7 @@ Type* Typer::Visitor::JSCallTyper(Type* fun, Typer* t) {
           return t->cache_.kJSDateSecondType;
         case kDateGetTime:
           return t->cache_.kJSDateValueType;
-
+          */
         // Number functions.
         case kNumberIsFinite:
         case kNumberIsInteger:
@@ -1559,6 +1508,7 @@ Type* Typer::Visitor::JSCallTyper(Type* fun, Typer* t) {
           return Type::String();
 
         // RegExp functions.
+          /*
         case kRegExpCompile:
           return Type::OtherObject();
         case kRegExpExec:
@@ -1567,7 +1517,7 @@ Type* Typer::Visitor::JSCallTyper(Type* fun, Typer* t) {
           return Type::Boolean();
         case kRegExpToString:
           return Type::String();
-
+          */
         // Function functions.
         case kFunctionBind:
           return Type::BoundFunction();

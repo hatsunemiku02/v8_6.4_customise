@@ -7937,11 +7937,12 @@ WasmModuleObjectBuilderStreaming::WasmModuleObjectBuilderStreaming(
   promise_.Reset(isolate, resolver->GetPromise());
 
   if (i::FLAG_wasm_stream_compilation) {
+    /*
     i::Handle<i::JSPromise> promise = Utils::OpenHandle(*GetPromise());
     i::Isolate* i_isolate = reinterpret_cast<i::Isolate*>(isolate);
     streaming_decoder_ =
         i_isolate->wasm_compilation_manager()->StartStreamingCompilation(
-            i_isolate, handle(i_isolate->context()), promise);
+            i_isolate, handle(i_isolate->context()), promise);*/
   }
 }
 
@@ -7979,12 +7980,13 @@ void WasmModuleObjectBuilderStreaming::Finish() {
   }
   // AsyncCompile makes its own copy of the wire bytes. This inefficiency
   // will be resolved when we move to true streaming compilation.
-  i::wasm::AsyncCompile(reinterpret_cast<i::Isolate*>(isolate_),
-                        Utils::OpenHandle(*promise_.Get(isolate_)),
-                        {wire_bytes.get(), wire_bytes.get() + total_size_});
+  //i::wasm::AsyncCompile(reinterpret_cast<i::Isolate*>(isolate_),
+  //                      Utils::OpenHandle(*promise_.Get(isolate_)),
+  //                      {wire_bytes.get(), wire_bytes.get() + total_size_});
 }
 
 void WasmModuleObjectBuilderStreaming::Abort(Local<Value> exception) {
+  /*
   Local<Promise> promise = GetPromise();
   // The promise has already been resolved, e.g. because of a compilation
   // error.
@@ -7997,6 +7999,7 @@ void WasmModuleObjectBuilderStreaming::Abort(Local<Value> exception) {
   Local<Context> context = Utils::ToLocal(handle(i_isolate->context()));
   auto maybe = resolver->Reject(context, exception);
   CHECK_IMPLIES(!maybe.FromMaybe(false), i_isolate->has_scheduled_exception());
+  */
 }
 
 WasmModuleObjectBuilderStreaming::~WasmModuleObjectBuilderStreaming() {

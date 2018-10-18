@@ -160,8 +160,8 @@ void WebAssemblyCompile(const v8::FunctionCallbackInfo<v8::Value>& args) {
                   i_isolate->has_scheduled_exception());
     return;
   }
-  i::Handle<i::JSPromise> promise = Utils::OpenHandle(*resolver->GetPromise());
-  i::wasm::AsyncCompile(i_isolate, promise, bytes);
+ // i::Handle<i::JSPromise> promise = Utils::OpenHandle(*resolver->GetPromise());
+ // i::wasm::AsyncCompile(i_isolate, promise, bytes);
 }
 
 // WebAssembly.validate(bytes) -> bool

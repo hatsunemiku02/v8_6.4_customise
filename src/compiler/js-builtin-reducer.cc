@@ -2921,10 +2921,11 @@ Reduction JSBuiltinReducer::Reduce(Node* node) {
       return ReduceArrayPush(node);
     case kArrayShift:
       return ReduceArrayShift(node);
+      /*
     case kDateNow:
       return ReduceDateNow(node);
     case kDateGetTime:
-      return ReduceDateGetTime(node);
+      return ReduceDateGetTime(node);*/
     case kFunctionBind:
       return ReduceFunctionBind(node);
     case kGlobalIsFinite:

@@ -263,14 +263,14 @@ void SetupIsolateDelegate::SetupBuiltinsInternal(Isolate* isolate) {
   Code::cast(builtins->builtins_[Builtins::k##Name]) \
       ->set_is_promise_rejection(true);
 
-  BUILTIN_PROMISE_REJECTION_PREDICTION_LIST(SET_PROMISE_REJECTION_PREDICTION)
+ // BUILTIN_PROMISE_REJECTION_PREDICTION_LIST(SET_PROMISE_REJECTION_PREDICTION)
 #undef SET_PROMISE_REJECTION_PREDICTION
 
 #define SET_EXCEPTION_CAUGHT_PREDICTION(Name)        \
   Code::cast(builtins->builtins_[Builtins::k##Name]) \
       ->set_is_exception_caught(true);
 
-  BUILTIN_EXCEPTION_CAUGHT_PREDICTION_LIST(SET_EXCEPTION_CAUGHT_PREDICTION)
+ // BUILTIN_EXCEPTION_CAUGHT_PREDICTION_LIST(SET_EXCEPTION_CAUGHT_PREDICTION)
 #undef SET_EXCEPTION_CAUGHT_PREDICTION
 
 #define SET_CODE_NON_TAGGED_PARAMS(Name)             \

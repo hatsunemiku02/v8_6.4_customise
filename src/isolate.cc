@@ -3368,6 +3368,8 @@ namespace {
 MaybeHandle<JSPromise> NewRejectedPromise(Isolate* isolate,
                                           v8::Local<v8::Context> api_context,
                                           Handle<Object> exception) {
+  //return Undefined((v8::Isolate*)isolate);
+  
   v8::Local<v8::Promise::Resolver> resolver;
   ASSIGN_RETURN_ON_SCHEDULED_EXCEPTION_VALUE(
       isolate, resolver, v8::Promise::Resolver::New(api_context),
@@ -3378,7 +3380,8 @@ MaybeHandle<JSPromise> NewRejectedPromise(Isolate* isolate,
       MaybeHandle<JSPromise>());
 
   v8::Local<v8::Promise> promise = resolver->GetPromise();
-  return v8::Utils::OpenHandle(*promise);
+  //return v8::Utils::OpenHandle(*promise);
+  return MaybeHandle<JSPromise>();
 }
 
 }  // namespace
@@ -3410,7 +3413,8 @@ MaybeHandle<JSPromise> Isolate::RunHostImportModuleDynamicallyCallback(
           api_context, v8::Utils::ScriptOrModuleToLocal(referrer),
           v8::Utils::ToLocal(specifier_str)),
       MaybeHandle<JSPromise>());
-  return v8::Utils::OpenHandle(*promise);
+ // return v8::Utils::OpenHandle(*promise);
+  return MaybeHandle<JSPromise>();
 }
 
 void Isolate::SetHostImportModuleDynamicallyCallback(

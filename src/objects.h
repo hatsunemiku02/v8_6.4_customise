@@ -4512,16 +4512,6 @@ class ContextExtension : public Struct {
   V(Array.prototype, some, ArraySome)                       \
   V(Array.prototype, splice, ArraySplice)                   \
   V(Array.prototype, unshift, ArrayUnshift)                 \
-  V(Date, now, DateNow)                                     \
-  V(Date.prototype, getDate, DateGetDate)                   \
-  V(Date.prototype, getDay, DateGetDay)                     \
-  V(Date.prototype, getFullYear, DateGetFullYear)           \
-  V(Date.prototype, getHours, DateGetHours)                 \
-  V(Date.prototype, getMilliseconds, DateGetMilliseconds)   \
-  V(Date.prototype, getMinutes, DateGetMinutes)             \
-  V(Date.prototype, getMonth, DateGetMonth)                 \
-  V(Date.prototype, getSeconds, DateGetSeconds)             \
-  V(Date.prototype, getTime, DateGetTime)                   \
   V(Function.prototype, apply, FunctionApply)               \
   V(Function.prototype, bind, FunctionBind)                 \
   V(Function.prototype, call, FunctionCall)                 \
@@ -4531,10 +4521,6 @@ class ContextExtension : public Struct {
   V(Object.prototype, hasOwnProperty, ObjectHasOwnProperty) \
   V(Object.prototype, isPrototypeOf, ObjectIsPrototypeOf)   \
   V(Object.prototype, toString, ObjectToString)             \
-  V(RegExp.prototype, compile, RegExpCompile)               \
-  V(RegExp.prototype, exec, RegExpExec)                     \
-  V(RegExp.prototype, test, RegExpTest)                     \
-  V(RegExp.prototype, toString, RegExpToString)             \
   V(String.prototype, charCodeAt, StringCharCodeAt)         \
   V(String.prototype, charAt, StringCharAt)                 \
   V(String.prototype, codePointAt, StringCodePointAt)       \

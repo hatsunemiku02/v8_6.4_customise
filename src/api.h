@@ -111,7 +111,6 @@ class RegisteredExtension {
   V(NativeWeakMap, JSWeakMap)                  \
   V(debug::GeneratorObject, JSGeneratorObject) \
   V(debug::Script, Script)                     \
-  V(Promise, JSPromise)                        \
   V(Primitive, Object)                         \
   V(PrimitiveArray, FixedArray)                \
   V(ScriptOrModule, Script)

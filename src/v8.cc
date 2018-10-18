@@ -6,6 +6,7 @@
 
 #include "src/api.h"
 #include "src/assembler.h"
+#include "src/assert-scope.h"
 #include "src/base/atomicops.h"
 #include "src/base/once.h"
 #include "src/base/platform/platform.h"
@@ -16,12 +17,14 @@
 #include "src/frames.h"
 #include "src/isolate.h"
 #include "src/libsampler/sampler.h"
+#include "src/messages.h"
 #include "src/objects-inl.h"
 #include "src/profiler/heap-profiler.h"
 #include "src/runtime-profiler.h"
 #include "src/snapshot/natives.h"
 #include "src/snapshot/snapshot.h"
 #include "src/tracing/tracing-category-observer.h"
+#include "src/vm-state.h"
 
 namespace v8 {
 namespace internal {
@@ -35,12 +38,10 @@ V8_DECLARE_ONCE(init_snapshot_once);
 
 v8::Platform* V8::platform_ = NULL;
 
-
 bool V8::Initialize() {
   InitializeOncePerProcess();
   return true;
 }
-
 
 void V8::TearDown() {
   Bootstrapper::TearDownExtensions();
@@ -50,7 +51,6 @@ void V8::TearDown() {
   sampler::Sampler::TearDown();
   FlagList::ResetAllFlags();  // Frees memory held by string arguments.
 }
-
 
 void V8::InitializeOncePerProcessImpl() {
   FlagList::EnforceFlagImplications();
@@ -78,11 +78,9 @@ void V8::InitializeOncePerProcessImpl() {
   Bootstrapper::InitializeOncePerProcess();
 }
 
-
 void V8::InitializeOncePerProcess() {
   base::CallOnce(&init_once, &InitializeOncePerProcessImpl);
 }
-
 
 void V8::InitializePlatform(v8::Platform* platform) {
   CHECK(!platform_);
@@ -92,14 +90,12 @@ void V8::InitializePlatform(v8::Platform* platform) {
   v8::tracing::TracingCategoryObserver::SetUp();
 }
 
-
 void V8::ShutdownPlatform() {
   CHECK(platform_);
   v8::tracing::TracingCategoryObserver::TearDown();
   v8::base::SetPrintStackTrace(nullptr);
   platform_ = NULL;
 }
-
 
 v8::Platform* V8::GetCurrentPlatform() {
   v8::Platform* platform = reinterpret_cast<v8::Platform*>(
@@ -121,7 +117,6 @@ void V8::SetNativesBlob(StartupData* natives_blob) {
 #endif
 }
 
-
 void V8::SetSnapshotBlob(StartupData* snapshot_blob) {
 #ifdef V8_USE_EXTERNAL_STARTUP_DATA
   base::CallOnce(&init_snapshot_once, &SetSnapshotFromFile, snapshot_blob);
@@ -137,17 +132,44 @@ double Platform::SystemClockTimeMillis() {
 }
 }  // namespace v8
 
-V8_EXPORT void V8_ParseWithPlugin()
-{
+V8_EXPORT void V8_ParseWithPlugin() {
   V8_PluginCFG::GetInstance().V8_InjectFoo = true;
 }
 
-V8_EXPORT void V8_AddIntrinsicFoo( const char* name, void* fooaddr, int paramsize, int resultsize)
-{
-  v8::internal::AddIntrinsicFoo( name,  fooaddr,  paramsize,  resultsize);
+V8_EXPORT void V8_ParseWithOutPlugin() {
+  V8_PluginCFG::GetInstance().V8_InjectFoo = false;
 }
-V8_EXPORT int  GetCount()
-{
-  return V8_PluginCFG::GetInstance().OuputCount;
+
+using namespace v8;
+
+V8_EXPORT v8::Object* V8_ThrowException(v8::Isolate* pIsolate,
+                                        const char* error) {
+  internal::Isolate* isolate = (internal::Isolate*)(pIsolate);
+  internal::DisallowJavascriptExecution no_js(isolate);
+  internal::HandleScope scope(isolate);
+
+  internal::Handle<internal::JSFunction> fun = isolate->error_function();
+  internal::Handle<internal::Object> msg =
+      isolate->factory()->NewStringFromAsciiChecked(error);
+  internal::Handle<internal::Object> no_caller;
+  internal::Handle<internal::Object> exception;
+
+  {
+    if (!(internal::ErrorUtils::Construct(isolate, fun, fun, msg,
+                                          internal::SKIP_NONE, no_caller, true))
+             .ToHandle(&exception)) {
+      DCHECK((isolate)->has_pending_exception());
+      return (v8::Object*)isolate->heap()->exception();
+    }
+  }
+
+  isolate->Throw((internal::Object*)*exception, nullptr);
+  return (v8::Object*)isolate->heap()->exception();
 }
+
+V8_EXPORT void V8_AddIntrinsicFoo(const char* name, void* fooaddr,
+                                  int paramsize, int resultsize) {
+  v8::internal::AddIntrinsicFoo(name, fooaddr, paramsize, resultsize);
+}
+V8_EXPORT int GetCount() { return V8_PluginCFG::GetInstance().OuputCount; }
 V8_PluginCFG V8_PluginCFG::instance;

@@ -808,7 +808,7 @@ void PromiseBuiltinsAssembler::InternalResolvePromise(Node* context,
     Goto(&enqueue);
 
     // 12. Perform EnqueueJob("PromiseJobs",
-    // PromiseResolveThenableJob, Â« promise, resolution, thenActionÂ»).
+    // PromiseResolveThenableJob, èŠ?promise, resolution, thenActionç¦?.
     BIND(&enqueue);
     // TODO(gsathya): Move this to TF
     CallRuntime(Runtime::kEnqueuePromiseResolveThenableJob, context, info);
@@ -1006,6 +1006,8 @@ void PromiseBuiltinsAssembler::SetPromiseHandledByIfTrue(
 
 // ES#sec-promise-reject-functions
 // Promise Reject Functions
+
+/*
 TF_BUILTIN(PromiseRejectClosure, PromiseBuiltinsAssembler) {
   Node* const value = Parameter(Descriptor::kValue);
   Node* const context = Parameter(Descriptor::kContext);
@@ -1539,7 +1541,7 @@ TF_BUILTIN(PromiseReject, PromiseBuiltinsAssembler) {
     // 3. Let promiseCapability be ? NewPromiseCapability(C).
     Node* const capability = NewPromiseCapability(context, receiver);
 
-    // 4. Perform ? Call(promiseCapability.[[Reject]], undefined, Â« r Â»).
+    // 4. Perform ? Call(promiseCapability.[[Reject]], undefined, èŠ?r ç¦?.
     Node* const reject =
         LoadObjectField(capability, PromiseCapability::kRejectOffset);
     Callable call_callable = CodeFactory::Call(isolate());
@@ -1635,7 +1637,7 @@ TF_BUILTIN(PromiseThenFinally, PromiseBuiltinsAssembler) {
   Node* native_context = LoadNativeContext(context);
   Node* const value_thunk = CreateValueThunkFunction(value, native_context);
 
-  // 8. Return ? Invoke(promise, "then", Â« valueThunk Â»).
+  // 8. Return ? Invoke(promise, "then", èŠ?valueThunk ç¦?.
   Node* const promise_then =
     GetProperty(context, promise, factory()->then_string());
   Node* const result_promise = CallJS(call_callable, context,
@@ -1696,7 +1698,7 @@ TF_BUILTIN(PromiseCatchFinally, PromiseBuiltinsAssembler) {
   Node* native_context = LoadNativeContext(context);
   Node* const thrower = CreateThrowerFunction(reason, native_context);
 
-  // 8. Return ? Invoke(promise, "then", Â« thrower Â»).
+  // 8. Return ? Invoke(promise, "then", èŠ?thrower ç¦?.
   Node* const promise_then =
     GetProperty(context, promise, factory()->then_string());
   Node* const result_promise = CallJS(call_callable, context,
@@ -1760,7 +1762,7 @@ TF_BUILTIN(PromiseFinally, PromiseBuiltinsAssembler) {
     Goto(&perform_finally);
   }
 
-  // 7. Return ? Invoke(promise, "then", Â« thenFinally, catchFinally Â»).
+  // 7. Return ? Invoke(promise, "then", èŠ?thenFinally, catchFinally ç¦?.
   BIND(&perform_finally);
   Node* const promise_then =
     GetProperty(context, promise, factory()->then_string());
@@ -1769,7 +1771,7 @@ TF_BUILTIN(PromiseFinally, PromiseBuiltinsAssembler) {
            var_then_finally.value(), var_catch_finally.value());
   Return(result_promise);
 }
-
+*/
 TF_BUILTIN(ResolveNativePromise, PromiseBuiltinsAssembler) {
   Node* const promise = Parameter(Descriptor::kPromise);
   Node* const value = Parameter(Descriptor::kValue);
@@ -1806,7 +1808,7 @@ TF_BUILTIN(PerformNativePromiseThen, PromiseBuiltinsAssembler) {
                              UndefinedConstant(), UndefinedConstant());
   Return(result_promise);
 }
-
+/*
 Node* PromiseBuiltinsAssembler::PerformPromiseAll(
     Node* context, Node* constructor, Node* capability, Node* iterator,
     Label* if_exception, Variable* var_exception) {
@@ -1850,7 +1852,7 @@ Node* PromiseBuiltinsAssembler::PerformPromiseAll(
     Node* const next_value = iter_assembler.IteratorValue(
         context, next, fast_iterator_result_map, if_exception, var_exception);
 
-    // Let nextPromise be ? Invoke(constructor, "resolve", Â« nextValue Â»).
+    // Let nextPromise be ? Invoke(constructor, "resolve", èŠ?nextValue ç¦?.
     Node* const promise_resolve =
         GetProperty(context, constructor, factory()->resolve_string());
     GotoIfException(promise_resolve, &close_iterator, var_exception);
@@ -1900,8 +1902,8 @@ Node* PromiseBuiltinsAssembler::PerformPromiseAll(
       BIND(&done);
     }
 
-    // Perform ? Invoke(nextPromise, "then", Â« resolveElement,
-    //                  resultCapability.[[Reject]] Â»).
+    // Perform ? Invoke(nextPromise, "then", èŠ?resolveElement,
+    //                  resultCapability.[[Reject]] ç¦?.
     Node* const then =
         GetProperty(context, next_promise, factory()->then_string());
     GotoIfException(then, &close_iterator, var_exception);
@@ -1944,7 +1946,7 @@ Node* PromiseBuiltinsAssembler::PerformPromiseAll(
     // If remainingElementsCount.[[Value]] is 0, then
     //     Let valuesArray be CreateArrayFromList(values).
     //     Perform ? Call(resultCapability.[[Resolve]], undefined,
-    //                    Â« valuesArray Â»).
+    //                    èŠ?valuesArray ç¦?.
     BIND(&resolve_promise);
 
     Node* const resolve =
@@ -2179,7 +2181,7 @@ TF_BUILTIN(PromiseRace, PromiseBuiltinsAssembler) {
           iter_assembler.IteratorValue(context, next, fast_iterator_result_map,
                                        &reject_promise, &var_exception);
 
-      // Let nextPromise be ? Invoke(constructor, "resolve", Â« nextValue Â»).
+      // Let nextPromise be ? Invoke(constructor, "resolve", èŠ?nextValue ç¦?.
       Node* const promise_resolve =
           GetProperty(context, receiver, factory()->resolve_string());
       GotoIfException(promise_resolve, &close_iterator, &var_exception);
@@ -2188,8 +2190,8 @@ TF_BUILTIN(PromiseRace, PromiseBuiltinsAssembler) {
                                         promise_resolve, receiver, next_value);
       GotoIfException(next_promise, &close_iterator, &var_exception);
 
-      // Perform ? Invoke(nextPromise, "then", Â« resolveElement,
-      //                  resultCapability.[[Reject]] Â»).
+      // Perform ? Invoke(nextPromise, "then", èŠ?resolveElement,
+      //                  resultCapability.[[Reject]] ç¦?.
       Node* const then =
           GetProperty(context, next_promise, factory()->then_string());
       GotoIfException(then, &close_iterator, &var_exception);
@@ -2231,6 +2233,7 @@ TF_BUILTIN(PromiseRace, PromiseBuiltinsAssembler) {
     Return(promise);
   }
 }
-
+*/
 }  // namespace internal
 }  // namespace v8
+
